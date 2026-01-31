@@ -1,0 +1,11 @@
+<span class="logo" (click)="goToHome()">
+  <img src="../../../../assets/images/pngwing.com.png" alt="Pokeball Icon" />
+</span>
+
+<nav>
+  @if (isHome) {
+  <a href="javascript:void(0)" (click)="goToPokedex()" class="info button">Pokedex</a>
+  } @else {
+  <a href="javascript:void(0)" (click)="goToHome()" class="info button">Home</a>
+  }
+</nav>

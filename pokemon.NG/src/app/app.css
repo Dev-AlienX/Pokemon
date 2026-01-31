@@ -1,0 +1,30 @@
+
+main {
+  background-image: url('../assets/images/pokemon-7680x4320.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  position: relative;
+  height: 100vh;
+  max-height: 100%;
+  overflow-y: scroll;
+}
+
+#content {
+    background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+  height: calc(100% - 100px); /* Subtracting header (60px) and footer (40px) heights */
+}
+
+footer {
+  height: 40px;
+  width: 100%;
+  z-index: 1;
+}
+
+header {
+  height: 60px;
+  width: 100%;
+  z-index: 1;
+}

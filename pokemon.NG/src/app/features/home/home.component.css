@@ -1,0 +1,26 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Aligns items to the top */
+  flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+  gap: 60px;
+  height: 100%;
+}
+
+.filters,
+.suggestions {
+  /* Sets a max-width for larger screens */
+  width: 100%;
+}
+
+.filters {
+  height: calc(100% - 50%);
+  max-height: 400px;
+}
+
+.suggestions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

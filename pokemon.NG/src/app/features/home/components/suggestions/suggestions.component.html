@@ -1,0 +1,7 @@
+@if (error()) {
+  <div class="error-msg">Failed to load suggestions.</div>
+} @else {
+  @for (poke of pokemon(); track poke.id) {
+    <app-poke-card [name]="poke.name" [id]="poke.id" />
+  }
+}
