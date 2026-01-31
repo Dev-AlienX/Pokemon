@@ -1,0 +1,1 @@
+import{Ca as t,Ua as n,Va as p,bb as a}from"./chunk-PRXR3DKF.js";var m=class o{static \u0275fac=function(e){return new(e||o)};static \u0275cmp=t({type:o,selectors:[["app-pokedex"]],decls:2,vars:0,template:function(e,i){e&1&&(n(0,"p"),a(1,"pokedex works!"),p())},encapsulation:2})};export{m as PokedexComponent};
