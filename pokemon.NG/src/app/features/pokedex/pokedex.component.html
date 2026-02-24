@@ -1,1 +1,13 @@
-<p>pokedex works!</p>
+<h1>Pokedex</h1>
+
+<!-- @switch (pokemonListResource.state()) { @case ('loading') {
+  <app-loader [count]="12" />
+} @case ('loaded') { @if (pokemonListResource.value(); as pokemonList) { -->
+<ul>
+  @for (pokemon of pokemonListResource.value(); track pokemon.name) {
+  <li>{{ pokemon.name | titlecase }}</li>
+  }
+</ul>
+<!-- } @else {
+<p>No pokemon found.</p>
+} } } -->

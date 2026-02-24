@@ -70,5 +70,5 @@ body {
 
 .glass-effect {
   background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
 }

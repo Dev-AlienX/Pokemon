@@ -1,1 +1,11 @@
-<p>details works!</p>
+<!-- @switch (pokemonResource.status()) { @case (pokemonResource.status()) {
+<p>Loading...</p>
+} @case (ResourceStatus.Success) { -->
+@if (pokemonResource.value(); as pokemon) {
+  <div class="pokemonContainer">
+    {{ pokemon.name | titlecase }}
+  </div>
+} @else {
+  <p>Pokemon not found</p>
+}
+<!-- } } -->

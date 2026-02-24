@@ -18,6 +18,12 @@ export const routes: Routes = [
     title: 'Pokedex',
   },
   {
+    path: 'details/:id',
+    loadComponent: () =>
+      import('./features/details/details.component').then((m) => m.DetailsComponent),
+    title: 'Pokemon Details',
+  },
+  {
     path: '**',
     loadComponent: () =>
       import('./features/not-found/not-found.component').then((m) => m.NotFoundComponent),

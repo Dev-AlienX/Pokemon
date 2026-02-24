@@ -1,6 +1,6 @@
 <section class="filters">
-  <app-filters />
+  <app-filters (filterChange)="onFilterChanged($event)" />
 </section>
 <section class="suggestions">
-  <app-suggestions [pokemon] ="pokemonResource.value() || []" />
+  <app-suggestions [pokemon]="pokemon()" />
 </section>

@@ -1,8 +1,11 @@
+import { Router } from '@angular/router';
 import { TitleCasePipe, UpperCasePipe } from '@angular/common';
-import { FormsModule } from "@angular/forms";
-import { Component, computed, output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, signal, Output, EventEmitter } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { PokeService } from '../../../../core/services/poke.service';
 
-type FilterMode = 'pokemon' | 'type' | 'generation' | 'region';
+export type FilterMode = 'pokemon' | 'type' | 'generation' | 'region';
 
 @Component({
   selector: 'app-filters',
@@ -11,13 +14,18 @@ type FilterMode = 'pokemon' | 'type' | 'generation' | 'region';
   styleUrl: './filters.component.css',
 })
 export class FiltersComponent {
-  searchExecuted = output<{ mode: FilterMode; value: string }>();
+  private pokeService = inject(PokeService);
+  private router = inject(Router);
   searchMode = signal<FilterMode>('pokemon');
   query = signal('');
 
-  types = ['fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy', 'ghost'];
-  generations = ['gen-i', 'gen-ii', 'gen-iii', 'gen-iv', 'gen-v', 'gen-vi', 'gen-vii', 'gen-viii', 'gen-ix'];
-  regions = ['kanto', 'johto', 'hoenn', 'sinnoh', 'unova', 'kalos', 'alola', 'galar', 'paldea'];
+  @Output() filterChange = new EventEmitter<{ filterType: FilterMode; filterValue: string }>();
+
+  types = toSignal(this.pokeService.getMetadataList('type'), { initialValue: [] });
+  generations = toSignal(this.pokeService.getMetadataList('generation'), {
+    initialValue: [],
+  });
+  regions = toSignal(this.pokeService.getMetadataList('region'), { initialValue: [] });
 
   placeholderText = computed(() => {
     const mode = this.searchMode();
@@ -27,14 +35,18 @@ export class FiltersComponent {
 
   selectCapsule(value: string) {
     this.query.set(value);
-    this.onSearch();
+    // this.onSearch();
   }
 
   onSearch() {
-    if (!this.query().trim()) return;
-    this.searchExecuted.emit({
-      mode: this.searchMode(),
-      value: this.query().toLowerCase().trim()
-    });
+    const query = this.query().toLowerCase().trim();
+    if (!query) return;
+
+    const mode = this.searchMode();
+    if (mode === 'pokemon') {
+      this.router.navigate(['/details', query]);
+    } else {
+      this.filterChange.emit({ filterType: mode, filterValue: query });
+    }
   }
 }

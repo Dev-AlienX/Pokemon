@@ -1,8 +1,9 @@
-import { Component, signal, resource, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { PokeService } from '../../core/services/poke.service';
-import { FiltersComponent } from './components/filters/filters.component';
+import { FiltersComponent, FilterMode } from './components/filters/filters.component';
 import { SuggestionsComponent } from './components/suggestions/suggestions.component';
+import { Pokemon } from '../../shared/models/pokemon.interfaces';
 
 @Component({
   selector: 'app-home',
@@ -14,39 +15,53 @@ import { SuggestionsComponent } from './components/suggestions/suggestions.compo
     class: 'home-component',
   },
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   private pokeService = inject(PokeService);
 
-  // Source Signal: Changing this triggers the resource reload
-  randomIds = signal<number[]>(this.generateUniqueIds(6));
+  pokemon = signal<Pokemon[]>([]);
 
-  // Resource API: Handles batch fetching and loading states
-  pokemonResource = resource({
-    loader: async () => {
-      const ids = this.randomIds();
-      const tasks = ids.map((id: number) =>
-        firstValueFrom(this.pokeService.getPokemonByNameOrId(id)),
-      );
-      return await Promise.all(tasks);
-    },
-  });
+  ngOnInit(): void {
+    this.fetchRandomPokemon();
+  }
 
-  // Helper to generate 6 unique IDs
+  async onFilterChanged({ filterType, filterValue, }: { filterType: FilterMode;  filterValue: string; }) {
+    if (filterType === 'pokemon') {
+      // The 'pokemon' mode is handled by router navigation in FiltersComponent
+      return;
+    }
+
+    const pokemonList = await firstValueFrom(
+      this.pokeService.getPokemonByFilter(filterType, filterValue),
+    );
+
+    const randomPokemonNames = this.getRandomPokemon(pokemonList.results, 6).map((p) => p.name);
+
+    const tasks = randomPokemonNames.map((name) =>
+      firstValueFrom(this.pokeService.getPokemonByNameOrId(name)),
+    );
+
+    const pokemonDetails = await Promise.all(tasks);
+    this.pokemon.set(pokemonDetails);
+  }
+
+  private async fetchRandomPokemon() {
+    const ids = this.generateUniqueIds(6);
+    const tasks = ids.map((id: number) =>
+      firstValueFrom(this.pokeService.getPokemonByNameOrId(id)),
+    );
+    const pokemonDetails = await Promise.all(tasks);
+    this.pokemon.set(pokemonDetails);
+  }
+
+  private getRandomPokemon<T>(list: T[], count: number): T[] {
+    return [...list].sort(() => 0.5 - Math.random()).slice(0, count);
+  }
+
   private generateUniqueIds(count: number): number[] {
     const ids = new Set<number>();
     while (ids.size < count) {
       ids.add(Math.floor(Math.random() * 1025) + 1);
     }
     return Array.from(ids);
-  }
-
-  refreshSuggestions() {
-    this.randomIds.set(this.generateUniqueIds(6));
-  }
-
-  ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    this.refreshSuggestions();
   }
 }
