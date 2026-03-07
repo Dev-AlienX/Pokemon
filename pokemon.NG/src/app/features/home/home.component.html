@@ -1,5 +1,5 @@
 <section class="filters">
-  <app-filters (filterChange)="onFilterChanged($event)" />
+  <app-filters (filterChange)="onFilterChanged($event)" (pokemonFound)="onPokemonFound($event)" />
 </section>
 <section class="suggestions">
   <app-suggestions [pokemon]="pokemon()" />

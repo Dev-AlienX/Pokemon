@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable, switchMap, catchError, of } from 'rxjs';
 import { Pokemon, PokemonListResponse } from '../../shared/models/pokemon.interfaces';
 
 @Injectable({
@@ -54,6 +54,58 @@ export class PokeService {
         return {
           count: results.length,
           results: results,
+        };
+      }),
+    );
+  }
+
+  private allPokemonCache$!: Observable<PokemonListResponse>;
+
+  private getAllPokemon() {
+    if (!this.allPokemonCache$) {
+      this.allPokemonCache$ = this.http.get<PokemonListResponse>(
+        `${this.baseUrl}/pokemon?limit=10000`,
+      );
+    }
+    return this.allPokemonCache$;
+  }
+
+  getPokemon(searchTerm: string): Observable<PokemonListResponse> {
+    if (/^\d+$/.test(searchTerm)) {
+      return this.getPokemonByNameOrId(searchTerm).pipe(
+        map((pokemon) => ({
+          count: 1,
+          results: [
+            {
+              name: pokemon.name,
+              url: `${this.baseUrl}/pokemon/${pokemon.id}/`,
+            },
+          ],
+        })),
+        catchError(() => of({ count: 0, results: [] })),
+      );
+    }
+
+    return this.getAllPokemon().pipe(
+      map((response) => {
+        const filtered = response.results.filter((p) =>
+          p.name.includes(searchTerm.toLowerCase()),
+        );
+
+        const exactMatch = filtered.find(
+          (p) => p.name === searchTerm.toLowerCase(),
+        );
+
+        if (exactMatch) {
+          return {
+            count: 1,
+            results: [exactMatch],
+          };
+        }
+
+        return {
+          count: filtered.length,
+          results: filtered.slice(0, 6),
         };
       }),
     );

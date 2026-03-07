@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { PokeService } from '../../core/services/poke.service';
 import { FiltersComponent, FilterMode } from './components/filters/filters.component';
 import { SuggestionsComponent } from './components/suggestions/suggestions.component';
-import { Pokemon } from '../../shared/models/pokemon.interfaces';
+import { Pokemon, PokemonListResponse } from '../../shared/models/pokemon.interfaces';
 
 @Component({
   selector: 'app-home',
@@ -22,6 +22,22 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchRandomPokemon();
+  }
+
+  async onPokemonFound(pokemonList: PokemonListResponse) {
+    if (!pokemonList || pokemonList.results.length === 0) {
+      this.pokemon.set([]);
+      return;
+    }
+    
+    const pokemonNames = pokemonList.results.map((p) => p.name);
+
+    const tasks = pokemonNames.map((name) =>
+      firstValueFrom(this.pokeService.getPokemonByNameOrId(name)),
+    );
+
+    const pokemonDetails = await Promise.all(tasks);
+    this.pokemon.set(pokemonDetails);
   }
 
   async onFilterChanged({ filterType, filterValue, }: { filterType: FilterMode;  filterValue: string; }) {

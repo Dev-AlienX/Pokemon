@@ -38,13 +38,18 @@ export class FiltersComponent {
     // this.onSearch();
   }
 
+  @Output() pokemonFound = new EventEmitter<any>();
+
   onSearch() {
     const query = this.query().toLowerCase().trim();
     if (!query) return;
 
     const mode = this.searchMode();
     if (mode === 'pokemon') {
-      this.router.navigate(['/details', query]);
+      this.pokeService.getPokemon(query).subscribe(results => {
+        this.pokemonFound.emit(results);
+      });
+      // this.router.navigate(['/details', query]);
     } else {
       this.filterChange.emit({ filterType: mode, filterValue: query });
     }

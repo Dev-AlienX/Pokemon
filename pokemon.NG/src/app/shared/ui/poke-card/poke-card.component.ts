@@ -1,10 +1,11 @@
 import { TitleCasePipe } from '@angular/common';
 import { Component, input, output, computed } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-poke-card',
   standalone: true,
-  imports: [TitleCasePipe],
+  imports: [TitleCasePipe, RouterLink],
   templateUrl: './poke-card.component.html',
   styleUrl: './poke-card.component.css',
 })

@@ -10,7 +10,7 @@
       type="text"
       [(ngModel)]="query"
       [placeholder]="placeholderText()"
-      (keyup.enter)="onSearch()"
+      (input)="onSearch()"
     />
     <select [(ngModel)]="searchMode" class="mode-select">
       <option value="pokemon">Pokémon</option>
@@ -18,7 +18,6 @@
       <option value="generation">Generation</option>
       <option value="region">Region</option>
     </select>
-
     <button (click)="onSearch()" class="search-btn">Search</button>
   </div>
   <div class="capsule-container">
