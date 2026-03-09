@@ -1,11 +1,114 @@
-<!-- @switch (pokemonResource.status()) { @case (pokemonResource.status()) {
-<p>Loading...</p>
-} @case (ResourceStatus.Success) { -->
-@if (pokemonResource.value(); as pokemon) {
-  <div class="pokemonContainer">
-    {{ pokemon.name | titlecase }}
+<div class="details-container" *ngIf="pokemonResource.value() as data; else loading">
+  <!-- Header Section -->
+  <div class="header" [style.background]="getPokemonBackground(data.pokemon.types)">
+    <div class="header-top">
+      <button class="back-btn" (click)="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      </button>
+      <span class="pokemon-id">#{{ data.pokemon.id | number:'3.0-0' }}</span>
+    </div>
+
+    <div class="pokemon-identity">
+      <h1 class="pokemon-name">{{ data.pokemon.name | titlecase }}</h1>
+      <div class="types">
+        <span *ngFor="let t of data.pokemon.types" class="type-badge">
+          {{ t.type.name | titlecase }}
+        </span>
+      </div>
+    </div>
+
+    <div class="pokemon-image-wrapper">
+      <img [src]="data.pokemon.sprites.other['official-artwork'].front_default" 
+           [alt]="data.pokemon.name" 
+           class="pokemon-image">
+    </div>
   </div>
-} @else {
-  <p>Pokemon not found</p>
-}
-<!-- } } -->
+
+  <!-- Content Body -->
+  <div class="details-body">
+    <div class="scroll-content">
+      <!-- About Section -->
+      <div class="section">
+        <h3 class="section-title" [style.color]="data.pokemon.types[0].type.name | typeColor">About</h3>
+        <div class="info-grid">
+          <div class="info-row">
+            <span class="label">Height</span>
+            <span class="value">{{ data.pokemon.height / 10 }} m</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Weight</span>
+            <span class="value">{{ data.pokemon.weight / 10 }} kg</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Abilities</span>
+            <span class="value text-capitalize">{{ getAbilities(data.pokemon.abilities) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Section -->
+      <div class="section">
+        <h3 class="section-title" [style.color]="data.pokemon.types[0].type.name | typeColor">Base Stats</h3>
+        <div class="stats-grid">
+          <div *ngFor="let stat of data.pokemon.stats" class="stat-row">
+            <span class="stat-label">{{ formatStatName(stat.stat.name) }}</span>
+            <span class="stat-num">{{ stat.base_stat }}</span>
+            <div class="progress-bg">
+              <div class="progress-fill" 
+                   [style.width.%]="(stat.base_stat / 200) * 100"
+                   [style.background-color]="data.pokemon.types[0].type.name | typeColor">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attacks Section -->
+      <div class="section">
+        <h3 class="section-title" [style.color]="data.pokemon.types[0].type.name | typeColor">Attacks</h3>
+        <div class="attacks-list">
+          <span *ngFor="let move of getMoves($any(data.pokemon).moves)" class="attack-badge">
+            {{ move | titlecase }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Type Effectiveness Section -->
+      <div class="section">
+        <h3 class="section-title" [style.color]="data.pokemon.types[0].type.name | typeColor">Type Effectiveness</h3>
+        <div class="effectiveness-container">
+          <div class="effectiveness-group">
+            <span class="label">Weak Against</span>
+            <div class="types-row">
+              <span *ngFor="let type of data.damageRelations.weakAgainst" class="type-badge" [style.background-color]="type | typeColor">
+                {{ type | titlecase }}
+              </span>
+            </div>
+          </div>
+          <div class="effectiveness-group">
+            <span class="label">Super Effective Against</span>
+            <div class="types-row">
+              <span *ngFor="let type of data.damageRelations.superEffectiveAgainst" class="type-badge" [style.background-color]="type | typeColor">
+                {{ type | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolution Section -->
+      <div class="section">
+        <h3 class="section-title" [style.color]="data.pokemon.types[0].type.name | typeColor">Evolution</h3>
+        <div class="evolution-chain">
+          <div *ngFor="let evo of data.evolutionChain; let last = last" class="evo-item" (click)="onEvolutionClick(evo.name)">
+            <img [src]="evo.imageUrl" [alt]="evo.name">
+            <span class="evo-name">{{ evo.name | titlecase }}</span>
+            <span *ngIf="!last" class="arrow">➜</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading><app-loader></app-loader></ng-template>

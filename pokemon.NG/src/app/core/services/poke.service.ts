@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable, switchMap, catchError, of } from 'rxjs';
-import { Pokemon, PokemonListResponse } from '../../shared/models/pokemon.interfaces';
+import { Pokemon, PokemonListResponse, EvolutionChain } from '../../shared/models/pokemon.interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -114,5 +114,13 @@ export class PokeService {
   // For specific details (Home suggestions & Details page)
   getPokemonByNameOrId(nameOrId: string | number) {
     return this.http.get<Pokemon>(`${this.baseUrl}/pokemon/${nameOrId}`);
+  }
+
+  getEvolutionChainBySpeciesUrl(speciesUrl: string): Observable<EvolutionChain> {
+    return this.http.get<{ evolution_chain: { url: string } }>(speciesUrl).pipe(
+      switchMap(speciesData => {
+        return this.http.get<EvolutionChain>(speciesData.evolution_chain.url);
+      })
+    );
   }
 }
