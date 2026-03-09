@@ -1,0 +1,1 @@
+import{Ha as n,ab as e,bb as p,mb as a}from"./chunk-5TJ2BOD7.js";var m=class t{static \u0275fac=function(o){return new(o||t)};static \u0275cmp=n({type:t,selectors:[["app-not-found"]],decls:2,vars:0,template:function(o,i){o&1&&(e(0,"p"),a(1,"not-found works!"),p())},encapsulation:2})};export{m as NotFoundComponent};
